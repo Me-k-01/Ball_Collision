@@ -1,7 +1,7 @@
 
 class Vector {
     // Représente un point 3D dans l'espace
-    constructor(x, y, z) {
+    constructor(x=0, y=0, z=0) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -64,5 +64,11 @@ class Vector {
     }
     clone() {
         return new Vector(this.x, this.y, this.z);
+    }
+
+    zeroes() { // Reset les parametres à 0
+        this.x = 0;
+        this.y = 0; 
+        this.z = 0;
     }
 }

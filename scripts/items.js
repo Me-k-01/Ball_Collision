@@ -3,7 +3,7 @@ class Plane {
     constructor(x, y, z, θ=0, φ=0) {
         this.pos  = new Vector(x, y, z); 
         this.drawSize = 500;
-        this.n = new Vector(0, 0, 0);
+        this.n = new Vector();
         this.setNormalFromRotation(θ, φ); 
         this.θ = θ;
     }
@@ -70,8 +70,7 @@ class Sphere {
         this.reset(); 
         this.r = 70; // Radius de la sphere
         this.prevD = this.calcD(ground);
-        this.prevDeltaTime = 0;
-        this.prevPos = this.spawnPos.clone();
+        this.prevDeltaTime = 0; 
     }
 
     
@@ -86,25 +85,28 @@ class Sphere {
     }
  
     update(dT) {  
-        this.vel.y += config.gravity.value();
-        this.vel.mult(config.damping.value());
-
-        this.groundCollide(dT);  
-        this.prevPos = this.pos.clone();
-        this.pos.add(this.vel.clone().mult(dT)); 
  
-        this.prevDeltaTime = dT;
  
-
+        // Acceleration
         // v(t+dT) = v(t) + a(t)*dT
+        this.vel.y += config.gravity.value() * dT;
+        this.vel.mult(config.damping.value());
+        // Deplacement
         // P(t+dT) = P(t) + n(t)*dT
+        this.pos.add(this.vel.clone().mult(dT)); 
+
+        this.groundCollide(dT);   
+
+        this.prevDeltaTime = dT;
+
+  
         //  euler explicit -> pas ouf
         // Euler simplectique : un peu plus stable
     }
 
-    calcD(obj) {
-        let d = this.pos.clone().sub(obj.pos).dot(obj.n);
-        d -= Math.sign(d) * this.r; 
+    calcD(plan) { // Retourne une pseudo-distance entre la balle et un plan (peut êtres negatif suivant la position par rapport a la normal)
+        let d = this.pos.clone().sub(plan.pos).dot(plan.n); 
+        d -= Math.sign(d) * this.r;  // prendre en compte le rayon de la balle 
         return d;
     }
 
@@ -129,7 +131,6 @@ class Sphere {
             // Correction
             let f = this.prevD/(this.prevD-d); // Moment de la collison entre les deux derniers updates
             //this.pos.add(n.clone().mult(Math.sign(this.prevD) * (this.r - Math.abs(d)))) ; 
-            //this.pos = this.prevPos.add(this.vel.clone().mult((1-f) ));
             
 
             // Reponse de collision
@@ -152,17 +153,12 @@ class Sphere {
                 // is ║Ft║ < μ║Fn║ 
             
             if (newVel.norm() < config.resting.value()) {  
-                newVel.x = 0;
-                newVel.y = 0;
-                newVel.z = 0;
-                console.log("fzojfez")
+                newVel.zeroes();
             }
  
             // Correction de la position
-            this.pos.sub(this.vel.clone().mult((1-f) * this.prevDeltaTime)); // Retirer la dernière partie 
-            this.pos.add(newVel.clone().mult((1-f) * this.prevDeltaTime)); // Corriger vers la nouvelle direction 
-
-             
+            this.pos.sub(this.vel.clone().mult((1-f) * dT)); // Retirer la dernière partie 
+            this.pos.add(newVel.clone().mult((1-f) * dT)); // Corriger vers la nouvelle direction 
 
             this.vel = newVel;
         }  

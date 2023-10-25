@@ -1,7 +1,7 @@
 let items = []; 
 let cam; 
 let ground;
-let font; 
+let font;
 
 let config = {}; 
 let menu;
@@ -52,8 +52,9 @@ function addSliderOfVec(key, min, max, step=1, subSliderValues={x : 0, y : 0, z:
 }
 
 //////////////////////////  
-function preload() {
-    font = loadFont('assets/Inconsolata-Regular.ttf');
+function preload() { 
+    if (window.location.protocol !== "file:")
+        font = loadFont('assets/Inconsolata-Regular.ttf'); 
 }
  
 
@@ -64,7 +65,7 @@ function setup() {
 
     textSize(15);
     background(20, 20, 20);
-    textFont(font);
+    textFont("Helvetica");
     textSize(35);
  
     menu = createDiv();
@@ -75,15 +76,15 @@ function setup() {
     // coef de friction : 0.05 -> teflon over teflon,  0.35 -> Wood on wood, 0.65 -> steel over steel 
     addSlider("cf", createSlider(0, 1, 0.35, 0.01));
     // Condition de repos
-    addSlider("resting", createSlider(0, 200, 24, 1));
+    addSlider("resting", createSlider(0, 200, 20, 1));
     // drag causé par la friction de l'air
-    addSlider("damping", createSlider(0, 1, 0.96, 0.01));
+    addSlider("damping", createSlider(0, 1, 0.98, 0.01));
     // Gravité
-    addSlider("gravity", createSlider(0, 20, 4, 1));  
+    addSlider("gravity", createSlider(0, 50, 14, 1));  
 
     addSliderOfVec("throwingStrength", 0, 500);
 
-    ground = new Plane(0, 0, 0, Math.PI, 0);  
+    ground = new Plane(0, 0, 0, 0, 0);  
     /*addSliderOfVec("rotation plan", 0, Math.PI * 2, step=0.01, {
             //θ : Math.round(ground.rotate.x*100)/100, 
             //φ : Math.round(ground.rotate.z*100)/100
@@ -94,7 +95,7 @@ function setup() {
             console.log(config["rotation plan"]["θ"].value());
             ground.setNormalFromRotation(config["rotation plan"]["θ"].value(), config["rotation plan"]["φ"].value())
     });*/
-    addSlider("tilt", createSlider(Math.PI/2, Math.PI*2 , ground.θ, 0.01), () => {
+    addSlider("tilt", createSlider(-Math.PI/2, Math.PI/2 , ground.θ, 0.01), () => {
         ground.setNormalFromRotation(config["tilt"].value());
     })
 
