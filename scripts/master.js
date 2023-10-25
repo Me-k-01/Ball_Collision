@@ -53,6 +53,7 @@ function addSliderOfVec(key, min, max, step=1, subSliderValues={x : 0, y : 0, z:
 
 //////////////////////////  
 function preload() { 
+    console.log(window.location.protocol);
     if (window.location.protocol !== "file:")
         font = loadFont('assets/Inconsolata-Regular.ttf'); 
 }
@@ -65,7 +66,7 @@ function setup() {
 
     textSize(15);
     background(20, 20, 20);
-    textFont("Helvetica");
+    textFont(font);
     textSize(35);
  
     menu = createDiv();
